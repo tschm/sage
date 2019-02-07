@@ -1,0 +1,13 @@
+**/__pycache__
+**/*.pyc
+build
+html-coverage
+html-report
+source
+.env
+.gitignore
+build.sh
+
+docker-compose.yml
+test.sh
+books

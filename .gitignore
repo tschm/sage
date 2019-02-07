@@ -1,0 +1,15 @@
+*.pyc
+.idea
+env
+tmp
+*.log
+build
+html-coverage
+html-report
+
+
+sandbox
+.env
+
+*.ipynb
+.ipynb_checkpoints
