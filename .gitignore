@@ -11,5 +11,4 @@ html-report
 sandbox
 .env
 
-*.ipynb
 .ipynb_checkpoints
