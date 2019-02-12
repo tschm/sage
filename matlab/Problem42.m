@@ -32,7 +32,7 @@ P = 30;  % power cutoff
 Ignore = -22;
 Psi = zeros(K,2,P);
 % compute the sums Psi_{i} explicitly for up to 5 digits
-for i = 1:size(S,1)
+for i = 1:size(S,1)      # ... = 5
     for k = 1:P
         Psi(i,1,k) = sum(S{i,1}.^(-k));
         Psi(i,2,k) = sum(S{i,2}.^(-k));
