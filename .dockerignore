@@ -10,4 +10,3 @@ build.sh
 
 docker-compose.yml
 test.sh
-books
