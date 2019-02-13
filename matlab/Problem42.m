@@ -44,7 +44,7 @@ for i = 1:size(S,1)      # ... = 5
     end
 end
 
-disp(Psi)
+#disp(Psi)
 
 
 warning('off','MATLAB:log:logOfZero');
@@ -66,6 +66,10 @@ for i = size(S,1)+1:1:K
 end
 warning('on','MATLAB:log:logOfZero');
 % Extrapolation
+
+disp(sum(B*Psi(K,:,1)'))
+disp(sum(sum(Psi(:,:,1))))
+
 s = sum(B*Psi(K,:,1)') + sum(sum(Psi(:,:,1)));
 error = 228.44630415923081325414 - s;
 function [ a ] = aCoeff( k,w,m )
