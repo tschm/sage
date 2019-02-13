@@ -16,6 +16,8 @@ for s = 0:9
     A = A + f(:,:,s+1)/10;
 end
 I = eye(size(A)); B = inv(I-A)-I;
+#disp(B)
+
 %% define the S_1 and S_2 explicitly for integers with up to 5 digits
 S = cell(5,2); S{1,1} = [1,2,3,5,6,7,8,9]; S{1,2} = 4;
 for i = 2:size(S,1)
@@ -26,6 +28,9 @@ for i = 2:size(S,1)
         end
     end
 end
+#disp(S)
+
+
 %% define the numerical parameters
 K = 20;  % extrapolation
 P = 30;  % power cutoff
@@ -38,6 +43,10 @@ for i = 1:size(S,1)      # ... = 5
         Psi(i,2,k) = sum(S{i,2}.^(-k));
     end
 end
+
+disp(Psi)
+
+
 warning('off','MATLAB:log:logOfZero');
 for i = size(S,1)+1:1:K
     for k = 1:P
