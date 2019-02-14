@@ -31,9 +31,6 @@ def create_matrices(matrix, digits):
     for index, x in np.ndenumerate(S):
         S[index] = sg.vector(sg.ZZ, sorted(x))
 
-    # create the matrices f
-    # f = {j : np.zeros((matrix.shape[0], matrix.shape[0])) for j in range(matrix.shape[1])}
-
     f = np.zeros((matrix.shape[0], matrix.shape[0], matrix.shape[1]))
 
     # f[j,l,m] == 1 <=> T[l,m] = j is a matrix indicating whether
@@ -95,9 +92,9 @@ def Psi_matrix(S, extrapolation=20, cutoff=30, prec=None):
     return Psi
 
 
-def T_matrix(s):
+def T_matrix(s, base=10):
     n = len(s)
-    A = np.ones((n, 10), dtype=int)
+    A = np.ones((n, base), dtype=int)
     A[:, int(s[0])] = 2
     for n in range(1, len(s)):
         A[n, int(s[n])] = n + 2
