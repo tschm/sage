@@ -102,9 +102,16 @@ def T_matrix(s, base=10):
     return A
 
 
-def forward_interpolate(Psi, S, f):
+def forward_interpolate(Psi, f):
+    # todo: get rid of S here...
+    for k in range(Psi.shape[0]):
+        if Psi[k,0,1] == 0:
+            aaa = k
+            break
+
+
     # forward interpolate rows of Psi
-    for i in range(S.shape[0], Psi.shape[0]):
+    for i in range(aaa, Psi.shape[0]):
         for k in range(1, Psi.shape[2]):
             for index, x in np.ndenumerate(f):
                 if x > 0:
