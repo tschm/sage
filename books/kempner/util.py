@@ -111,30 +111,33 @@ def T_matrix(s, base=10):
     return A
 
 
-def T_matrix2(s, base=10):
-    ppp = set([""])
-    for a in s:
-        for w in range(len(a)):
-            ppp.add(a[:w + 1])
+def T_matrix2(strings, base=10):
+    if isinstance(strings, str):
+        strings = [strings]
 
-    k = list(ppp)
-    k = sorted(k, key=len)
+    ends = set([""])
+    for string in strings:
+        for w in range(len(string)):
+            ends.add(string[:w + 1])
 
-    aaa = [x for x in k if not x in s]
+    ends = list(ends)
+    ends = sorted(ends, key=len)
 
-    A = np.ones((len(aaa), base), dtype=int)
-    B = np.empty((len(aaa), base), dtype=object)
+    feasible = [x for x in ends if not x in strings]
+
+    A = np.ones((len(feasible), base), dtype=int)
+    B = np.empty((len(feasible), base), dtype=object)
 
     for index, b in np.ndenumerate(A):
-        B[index] = "{base}{digit}".format(digit=str(index[1]), base=aaa[index[0]])
+        B[index] = "{base}{digit}".format(digit=str(index[1]), base=feasible[index[0]])
 
-    for n in range(1, len(k)):
-        for index, a in np.ndenumerate(A):
-            if B[index].endswith(k[n]):
-                if k[n] in s:
+    for n in range(0, len(ends)):
+        for index, string in np.ndenumerate(A):
+            if B[index].endswith(ends[n]):
+                if ends[n] in strings:
                     A[index] = 0
                 else:
-                    A[index] = (n + 1)
+                    A[index] = n + 1
 
     return A
 
