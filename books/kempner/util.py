@@ -95,10 +95,47 @@ def Psi_matrix(S, extrapolation=20, cutoff=30, prec=None):
 def T_matrix(s, base=10):
     n = len(s)
     A = np.ones((n, base), dtype=int)
-    A[:, int(s[0])] = 2
-    for n in range(1, len(s)):
-        A[n, int(s[n])] = n + 2
-    A[-1, int(s[-1])] = 0
+    B = np.empty((n, base), dtype=object)
+
+    S = [""] + [s[:n+1] for n in range(len(s))]
+    print(S)
+
+    for index, b in np.ndenumerate(A):
+        B[index] = "{base}{digit}".format(digit=str(index[1]), base=S[index[0]])
+
+    for n in range(1, len(S)):
+        for index, a in np.ndenumerate(A):
+            if B[index].endswith(S[n]):
+                A[index] = (n+1) % len(S)
+
+    return A
+
+
+def T_matrix2(s, base=10):
+    ppp = set([""])
+    for a in s:
+        for w in range(len(a)):
+            ppp.add(a[:w + 1])
+
+    k = list(ppp)
+    k = sorted(k, key=len)
+
+    aaa = [x for x in k if not x in s]
+
+    A = np.ones((len(aaa), base), dtype=int)
+    B = np.empty((len(aaa), base), dtype=object)
+
+    for index, b in np.ndenumerate(A):
+        B[index] = "{base}{digit}".format(digit=str(index[1]), base=aaa[index[0]])
+
+    for n in range(1, len(k)):
+        for index, a in np.ndenumerate(A):
+            if B[index].endswith(k[n]):
+                if k[n] in s:
+                    A[index] = 0
+                else:
+                    A[index] = (n + 1)
+
     return A
 
 
