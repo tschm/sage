@@ -10,3 +10,10 @@ build.sh
 
 docker-compose.yml
 test.sh
+start.sh
+
+mathematica
+matlab
+binder
+
+.dockerignore
