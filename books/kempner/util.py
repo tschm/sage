@@ -1,4 +1,6 @@
 import numpy as np
+import pandas as pd
+
 import sage.all as sg
 
 assert 0 ** 0 == 1
@@ -8,8 +10,15 @@ def __shift_append(numbers, digit, base=10):
     return {a * base + digit for a in numbers}
 
 
+def xrange(max, start=0):
+    return list(range(start, max))
+
+
 def create_matrices(matrix, digits):
+    matrix = matrix.values
+
     S = np.empty((digits, matrix.shape[0]), dtype=set)
+
     # each element is explicitly set to be a set
     for index, x in np.ndenumerate(S):
         S[index] = set()
@@ -98,21 +107,21 @@ def T_matrix(strings, base=10):
 
     feasible = sorted(list(split_strings(strings)), key=len)
 
-    A = np.ones((len(feasible), base), dtype=int)
-    B = np.empty((len(feasible), base), dtype=object)
+    A = pd.DataFrame(index=feasible, columns=list(range(base)), data=0)
 
-    for index, b in np.ndenumerate(A):
-        B[index] = "{base}{digit}".format(digit=str(index[1]), base=feasible[index[0]])
+    ending = lambda digit, string : "{string}{digit}".format(digit=digit, string=string)
 
     for n, f in enumerate(feasible):
-        for index, _ in np.ndenumerate(A):
-            if B[index].endswith(f):
-                A[index] = n + 1
+        for string in A.index:
+            for digit in A.columns:
+                if ending(digit, string).endswith(f):
+                    A[digit][string] = n + 1
 
-    for string in strings:
-        for index, _ in np.ndenumerate(A):
-            if B[index].endswith(string):
-                A[index] = 0
+    for excluded in strings:
+        for string in A.index:
+            for digit in A.columns:
+                if ending(digit, string).endswith(excluded):
+                    A[digit][string] = 0
 
     return A
 
