@@ -17,3 +17,6 @@ matlab
 binder
 
 .dockerignore
+docker-compose.test.yml
+Dockerfile-Test
+test.sh

@@ -92,38 +92,11 @@ def Psi_matrix(S, extrapolation=20, cutoff=30, prec=None):
     return Psi
 
 
-def T_matrix(s, base=10):
-    n = len(s)
-    A = np.ones((n, base), dtype=int)
-    B = np.empty((n, base), dtype=object)
-
-    S = [""] + [s[:n+1] for n in range(len(s))]
-    print(S)
-
-    for index, b in np.ndenumerate(A):
-        B[index] = "{base}{digit}".format(digit=str(index[1]), base=S[index[0]])
-
-    for n in range(1, len(S)):
-        for index, a in np.ndenumerate(A):
-            if B[index].endswith(S[n]):
-                A[index] = (n+1) % len(S)
-
-    return A
-
-
-def T_matrix2(strings, base=10):
+def T_matrix(strings, base=10):
     if isinstance(strings, str):
         strings = [strings]
 
-    ends = set([""])
-    for string in strings:
-        for w in range(len(string)):
-            ends.add(string[:w + 1])
-
-    ends = list(ends)
-    ends = sorted(ends, key=len)
-
-    feasible = [x for x in ends if not x in strings]
+    feasible = sorted(list(split_strings(strings)), key=len)
 
     A = np.ones((len(feasible), base), dtype=int)
     B = np.empty((len(feasible), base), dtype=object)
@@ -131,15 +104,44 @@ def T_matrix2(strings, base=10):
     for index, b in np.ndenumerate(A):
         B[index] = "{base}{digit}".format(digit=str(index[1]), base=feasible[index[0]])
 
-    for n in range(0, len(ends)):
-        for index, string in np.ndenumerate(A):
-            if B[index].endswith(ends[n]):
-                if ends[n] in strings:
-                    A[index] = 0
-                else:
-                    A[index] = n + 1
+    for n, f in enumerate(feasible):
+        for index, _ in np.ndenumerate(A):
+            if B[index].endswith(f):
+                A[index] = n + 1
+
+    for string in strings:
+        for index, _ in np.ndenumerate(A):
+            if B[index].endswith(string):
+                A[index] = 0
 
     return A
+
+
+def split_string(string):
+    return set([string[:w] for w in range(len(string))])
+
+
+def split_strings(strings):
+    if isinstance(strings, str):
+        strings = [strings]
+
+    # define an empty set
+    ends = set([])
+
+    for string in strings:
+        words = split_string(string)
+
+        already = False
+        for word in words:
+            if word in strings:
+                # there is no need to include this string as already matched...
+                already = True
+
+        # print("union")
+        if not already:
+            ends = ends.union(words)
+
+    return ends
 
 
 def forward_interpolate(Psi, f):
@@ -148,7 +150,6 @@ def forward_interpolate(Psi, f):
         if Psi[k,0,1] == 0:
             aaa = k
             break
-
 
     # forward interpolate rows of Psi
     for i in range(aaa, Psi.shape[0]):

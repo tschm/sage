@@ -1,0 +1,11 @@
+# Set the base image to beakerx
+FROM sagemath/sagemath:8.6
+
+COPY ./books/kempner $/books/kempner
+COPY ./test            /books/test
+
+RUN sage -pip install --no-cache-dir pytest==3.0.6
+
+WORKDIR /books
+
+CMD py.test  /books/test

@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-docker-compose run -p "9011:8888" web
+docker-compose run -p "9011:8888" web sage-jupyter

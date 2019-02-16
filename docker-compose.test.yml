@@ -1,0 +1,12 @@
+version: '3.6'
+services:
+  test:
+     build:
+       context: .
+       dockerfile: Dockerfile-Test
+
+     volumes:
+        - ./books/kempner:/books/kempner:ro
+        - ./test:/books/test:ro
+        - ./artifacts:/books/artifacts
+        #- ./helpers:/opt/.pycharm_helpers/pycharm:ro

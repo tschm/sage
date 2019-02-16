@@ -7,7 +7,3 @@ services:
      volumes:
        - ./books:/opt/app/data
        - ./jupyter_notebook_config.py:/etc/jupyter/jupyter_notebook_config.py:ro
-     #ports:
-     #   - "8885:8888"
-     command:
-       sage-jupyter
