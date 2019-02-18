@@ -45,9 +45,10 @@ def forward_interpolate(Psi, f, matrix):
             for index, x in np.ndenumerate(f):
                 if x > 0:
                     for w in range(Psi.shape[2] - k):
-                        if Psi[i - 1, index[1], k + w] > 1e-200:
+                        c = Psi[i - 1, index[1], k + w]
+                        if c > 1e-200:
                             a = a_coeff(k, w, index[2], prec=500, base=matrix.shape[1])
-                            Psi[i, index[0], k] += a * Psi[i - 1, index[1], k + w]
+                            Psi[i, index[0], k] += a * c
 
     return Psi
 
@@ -61,24 +62,31 @@ def forward_interpolate2(Psi, f, extrapolation=30):
     #A.loc[Psi[1].index] = Psi[1]
 
     for k in Psi.keys():
-        A = pd.DataFrame(index=range(1, extrapolation), columns=Psi[k].columns)
+        A = pd.DataFrame(index=range(1, extrapolation), columns=Psi[k].columns, dtype=object)
         A.loc[Psi[k].index] = Psi[k]
         Psi[k] = A
+        #print(Psi[k])
+
+    #assert False
 
     # forward interpolate rows of Psi
     for k in Psi.keys():
         nmin = Psi[k].last_valid_index() + 1
         print(nmin)
+        Psi[k] = Psi[k].fillna(sg.Rational(0))
+        print(Psi[k].index[-1])
+        print(Psi[k])
+
         # loop over all rows
         for i in range(nmin, Psi[k].index[-1]):
+            print(i)
             for index, x in np.ndenumerate(f):
                 if x > 0:
                     for w in range(len(Psi)-k):
                         print(Psi[k + w][index[1] + 1][i - 1])
                         a = a_coeff(k, w, index[2] + 1, prec=500, base=f.shape[2])
-
-                        if Psi[k+w][index[1]+1][i-1] > 1e-200:
-                            Psi[k][index[0]+1][i] += a_coeff(k, w, index[2]+1, prec=500,
-                                                                                base=f.shape[2]) * Psi[k+w][index[1]+1][i-1]
+                        c = Psi[k+w][index[1]+1][i-1]
+                        if c > 1e-200:
+                            Psi[k][index[0]+1][i] += a * c
 
     return Psi
