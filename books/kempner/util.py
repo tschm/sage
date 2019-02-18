@@ -1,5 +1,5 @@
 from functools import partial
-
+import pandas as pd
 import numpy as np
 import sage.all as sg
 
@@ -7,11 +7,6 @@ from .sets import create_B, create_f, create_A, create_S
 from .psi import a_coeff, psi
 
 assert 0 ** 0 == 1
-
-
-def __shift_append(numbers, digit, base=10):
-    return {a * base + digit for a in numbers}
-
 
 def create_matrices(matrix, digits):
     S = create_S(matrix.values, digits)
@@ -37,7 +32,7 @@ def Psi_matrix2(S, cutoff=30, prec=None):
     return {k : S.applymap(partial(psi, k=k, prec=prec)) for k in range(1, cutoff)}
 
 
-def forward_interpolate(Psi, f):
+def forward_interpolate(Psi, f, matrix):
     # todo: get rid of S here...
     for k in range(Psi.shape[0]):
         if Psi[k,0,1] == 0:
@@ -51,7 +46,39 @@ def forward_interpolate(Psi, f):
                 if x > 0:
                     for w in range(Psi.shape[2] - k):
                         if Psi[i - 1, index[1], k + w] > 1e-200:
-                            Psi[i, index[0], k] = Psi[i, index[0], k] + a_coeff(k, w, index[2], prec=500, base=f.shape[2]) * Psi[
-                                i - 1, index[1], k + w]
+                            a = a_coeff(k, w, index[2], prec=500, base=matrix.shape[1])
+                            Psi[i, index[0], k] += a * Psi[i - 1, index[1], k + w]
+
+    return Psi
+
+
+def forward_interpolate2(Psi, f, extrapolation=30):
+    # todo: get rid of S here...
+    #print(Psi.keys())
+    #print(Psi[1])
+    #print(Psi[1].index)
+    #A = pd.DataFrame(index=range(1, extrapolation), columns=Psi[1].columns)
+    #A.loc[Psi[1].index] = Psi[1]
+
+    for k in Psi.keys():
+        A = pd.DataFrame(index=range(1, extrapolation), columns=Psi[k].columns)
+        A.loc[Psi[k].index] = Psi[k]
+        Psi[k] = A
+
+    # forward interpolate rows of Psi
+    for k in Psi.keys():
+        nmin = Psi[k].last_valid_index() + 1
+        print(nmin)
+        # loop over all rows
+        for i in range(nmin, Psi[k].index[-1]):
+            for index, x in np.ndenumerate(f):
+                if x > 0:
+                    for w in range(len(Psi)-k):
+                        print(Psi[k + w][index[1] + 1][i - 1])
+                        a = a_coeff(k, w, index[2] + 1, prec=500, base=f.shape[2])
+
+                        if Psi[k+w][index[1]+1][i-1] > 1e-200:
+                            Psi[k][index[0]+1][i] += a_coeff(k, w, index[2]+1, prec=500,
+                                                                                base=f.shape[2]) * Psi[k+w][index[1]+1][i-1]
 
     return Psi
