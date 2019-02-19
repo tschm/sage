@@ -3,10 +3,12 @@ import pandas as pd
 import numpy as np
 import sage.all as sg
 
+
 from .sets import create_B, create_f, create_A, create_S
 from .psi import a_coeff, psi
 
 assert 0 ** 0 == 1
+
 
 def create_matrices(matrix, digits):
     S = create_S(matrix.values, digits)
@@ -15,70 +17,73 @@ def create_matrices(matrix, digits):
     return S, f, A, create_B(A)
 
 
-def Psi_matrix(S, extrapolation=20, cutoff=30, prec=None):
-    Psi = np.empty((extrapolation, S.shape[1], cutoff), dtype=object)
+def Psi_matrix(matrix, digits, cutoff=30, extrapolation = 100, prec=None):
+    #assert isinstance(S, pd.DataFrame)
+    S = create_S(matrix.values, digits)
 
-    for index, x in np.ndenumerate(Psi):
-        Psi[index] = sg.Rational(0)
 
-    # compute the sums Psi_{i} explicitly for up to 5 digits
-    for index, s in np.ndenumerate(S):
-        for k in range(1, cutoff):
-            Psi[index[0], index[1], k] = psi(s, k, prec=prec)
+    #digits = S.shape[0]
+
+    Psi = {k: S.applymap(partial(psi, k=k, prec=prec)) for k in range(1, cutoff)}
+
+    for k in Psi.keys():
+        Psi[k] = Psi[k].append(pd.DataFrame(columns=Psi[k].columns, data=sg.Rational(0),
+                                            index=list(range(digits + 1, extrapolation))))
+
+    for i in range(digits + 1, extrapolation):
+        for k in Psi.keys():
+            for index, www in np.ndenumerate(matrix):
+                if www > 0:
+                    for w in range(extrapolation - k):
+                        if Psi[k+w][int(index[0]+1)][int(i-1)] > 1e-200:
+                            a = a_coeff(k, w, index[1], prec=500, base=matrix.shape[1])
+                            Psi[k][www][i] += a * Psi[k+w][int(index[0]+1)][int(i-1)]
 
     return Psi
 
-def Psi_matrix2(S, cutoff=30, prec=None):
-    return {k : S.applymap(partial(psi, k=k, prec=prec)) for k in range(1, cutoff)}
 
-
-def forward_interpolate(Psi, f, matrix):
-    # todo: get rid of S here...
-    for k in range(Psi.shape[0]):
-        if Psi[k,0,1] == 0:
+def forward_interpolate(Psi, matrix):
+    for k in range(Psi.shape[1]):
+        if Psi[1,k,0] == 0:
             aaa = k
             break
 
     # forward interpolate rows of Psi
-    for i in range(aaa, Psi.shape[0]):
-        for k in range(1, Psi.shape[2]):
-            for index, x in np.ndenumerate(f):
-                if x > 0:
+    for i in range(aaa, Psi.shape[1]):
+        for k in range(1, Psi.shape[0]):
+            for index, www in np.ndenumerate(matrix):
+                if www > 0:
                     for w in range(Psi.shape[2] - k):
-                        if Psi[i - 1, index[1], k + w] > 1e-200:
-                            a = a_coeff(k, w, index[2], prec=500, base=matrix.shape[1])
-                            Psi[i, index[0], k] += a * Psi[i - 1, index[1], k + w]
+                        if Psi[k+w, i - 1, index[0]] > 1e-200:
+                            a = a_coeff(k, w, index[1], prec=500, base=matrix.shape[1])
+                            Psi[k, i, www-1] += a * Psi[k+w, i - 1, index[0]]
 
     return Psi
 
 
-def forward_interpolate2(Psi, f, extrapolation=30):
-    # todo: get rid of S here...
-    #print(Psi.keys())
-    #print(Psi[1])
-    #print(Psi[1].index)
-    #A = pd.DataFrame(index=range(1, extrapolation), columns=Psi[1].columns)
-    #A.loc[Psi[1].index] = Psi[1]
+def forward_interpolate2(Psi, matrix, digits, extrapolation=30):
+    aaa = digits + 1
+    # append zero rows for forward interpolation
+    #for k in Psi.keys():
+    #    Psi[k] = Psi[k].append(pd.DataFrame(columns=Psi[k].columns, data=sg.Rational(0),
+    #                                        index=list(range(aaa, extrapolation))))
 
-    for k in Psi.keys():
-        A = pd.DataFrame(index=range(1, extrapolation), columns=Psi[k].columns)
-        A.loc[Psi[k].index] = Psi[k]
-        Psi[k] = A
+    # find first row
+    #B = Psi[1]
+    #for k in B.index:
+    #    if B[int(1)][k] == 0:
+    #        aaa = k
+    #        break
 
-    # forward interpolate rows of Psi
-    for k in Psi.keys():
-        nmin = Psi[k].last_valid_index() + 1
-        print(nmin)
-        # loop over all rows
-        for i in range(nmin, Psi[k].index[-1]):
-            for index, x in np.ndenumerate(f):
-                if x > 0:
-                    for w in range(len(Psi)-k):
-                        print(Psi[k + w][index[1] + 1][i - 1])
-                        a = a_coeff(k, w, index[2] + 1, prec=500, base=f.shape[2])
+    # important start with i digit numbers...
 
-                        if Psi[k+w][index[1]+1][i-1] > 1e-200:
-                            Psi[k][index[0]+1][i] += a_coeff(k, w, index[2]+1, prec=500,
-                                                                                base=f.shape[2]) * Psi[k+w][index[1]+1][i-1]
+    for i in range(aaa, extrapolation):
+        for k in Psi.keys():
+            for index, www in np.ndenumerate(matrix):
+                if www > 0:
+                    for w in range(extrapolation - k):
+                        if Psi[k+w][int(index[0]+1)][int(i-1)] > 1e-200:
+                            a = a_coeff(k, w, index[1], prec=500, base=matrix.shape[1])
+                            Psi[k][www][i] += a * Psi[k+w][int(index[0]+1)][int(i-1)]
 
     return Psi

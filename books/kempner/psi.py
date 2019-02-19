@@ -2,6 +2,7 @@ import sage.all as sg
 
 assert 0 ** 0 == 1
 
+
 def psi(x, k, prec):
     if (x[0] ** k) > 10**prec:
         return sg.Rational(0.0)
