@@ -9,6 +9,7 @@ assert 0 ** 0 == 1
 def __shift_append(numbers, digit, base=10):
     return {a * base + digit for a in numbers}
 
+
 def create_S(matrix, digits):
     assert isinstance(matrix, np.ndarray)
 
@@ -36,8 +37,7 @@ def create_S(matrix, digits):
     return S
 
 
-def create_f(matrix):
-    #matrix = matrix.values
+def __create_f(matrix):
     assert isinstance(matrix, np.ndarray)
 
     a = np.unique(matrix)
@@ -47,12 +47,17 @@ def create_f(matrix):
     return np.array(f.values())
 
 
+def create_B(matrix):
+    f = __create_f(matrix.values)
+    if f.size == 0:
+        return np.array([[]])
 
-def create_B(a):
+    a = __create_A(matrices=[f[:, :, s] for s in range(f.shape[-1])])
+
     x = sg.matrix(sg.QQ, sg.matrix(sg.QQ, np.eye(a.nrows())) - a)
     b = x.inverse() - sg.matrix(sg.QQ, np.eye(a.nrows()))
     return b
 
 
-def create_A(matrices):
+def __create_A(matrices):
     return sg.Matrix(sg.QQ, sum(matrices)/(1.0*len(matrices)))
