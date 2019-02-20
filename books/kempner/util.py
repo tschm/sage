@@ -23,6 +23,7 @@ def Psi_matrix(matrix, digits, cutoff=30, extrapolation = 100, prec=None):
 
     limit = 10 ** (prec * (-1))
 
+    # digits!!!
     for i in range(digits, extrapolation):
         for k in Psi.keys():
             if Psi[k][i - 1, 0] > 0:
@@ -34,6 +35,11 @@ def Psi_matrix(matrix, digits, cutoff=30, extrapolation = 100, prec=None):
                                 a = a_coeff(k, w, index[1], prec=prec, base=matrix.shape[1])
                                 Psi[k][i, www-1] += a * p
                             else:
+                                if k+w==2:
+                                    print("********************************")
+                                    print(limit, i, p)
+                                    print("********************************")
+
                                 break
 
     return Psi

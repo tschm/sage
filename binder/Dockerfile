@@ -6,4 +6,5 @@ COPY ./books ${HOME}/books
 RUN sage -pip install --no-cache-dir pandas==0.24.1 line-profiler
 
 EXPOSE 8888
+
 CMD sage-jupyter

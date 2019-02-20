@@ -39,11 +39,7 @@ def create_S(matrix, digits):
 
 def __create_f(matrix):
     assert isinstance(matrix, np.ndarray)
-
-    a = np.unique(matrix)
-    # this looks very inefficient for a sparse matrix. We create a dense matrix of ones to multiply elementwise with the
-    # sparse matrix == j
-    f = {j: np.ones_like(matrix)*(matrix==j) for j in set(a[a > 0])}
+    f = {j: np.ones_like(matrix)*(matrix==j) for j in range(1, matrix.shape[0] + 1)}
     return np.array(f.values())
 
 
@@ -53,6 +49,7 @@ def create_B(matrix):
         return np.array([[]])
 
     a = __create_A(matrices=[f[:, :, s] for s in range(f.shape[-1])])
+    assert a.nrows() == a.ncols(), "The shap of f is {s}".format(s=f.shape)
 
     x = sg.matrix(sg.QQ, sg.matrix(sg.QQ, np.eye(a.nrows())) - a)
     b = x.inverse() - sg.matrix(sg.QQ, np.eye(a.nrows()))
