@@ -5,5 +5,5 @@ services:
        context: .
        dockerfile: ./binder/Dockerfile
      volumes:
-       - ./books:/opt/app/data
+       - ./books:/home/sage/work
        - ./jupyter_notebook_config.py:/etc/jupyter/jupyter_notebook_config.py:ro
