@@ -2,9 +2,9 @@ import pytest
 import numpy as np
 import numpy.testing as npt
 import sage.all as sg
-from kempner.sets import create_B, create_S
+from pykempner.sets import create_B, create_S
 
-from kempner.strings import T_matrix
+from pykempner.strings import T_matrix
 
 
 @pytest.fixture
@@ -24,8 +24,8 @@ def test_create_B(matrix_42):
 
 def test_create_B_empty(matrix_empty):
     B = create_B(matrix_empty)
-    assert B.size == 0
-
+    assert B.nrows() == 1
+    assert B.ncols() == 1
 
 def test_create_S(matrix_42):
     s = create_S(matrix_42.values, digits=3)

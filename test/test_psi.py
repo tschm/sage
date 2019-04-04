@@ -1,5 +1,5 @@
 import sage.all as sg
-from kempner.psi import psi, a_coeff
+from pykempner.psi import psi, a_coeff
 import pytest
 
 

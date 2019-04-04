@@ -1,6 +1,6 @@
 import pandas as pd
 import pandas.util.testing as pdt
-from kempner.strings import T_matrix
+from pykempner.strings import T_matrix
 
 
 def test_erdoes_borwein():

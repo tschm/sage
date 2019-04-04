@@ -1,8 +1,8 @@
 import pytest
-from kempner.strings import T_matrix
-from kempner.util import Psi_matrix, extrapolate
+from pykempner.strings import T_matrix
+from pykempner.util import Psi_matrix, extrapolate
 import sage.all as sg
-from kempner.psi import psi
+from pykempner.psi import psi
 
 @pytest.fixture
 def matrix_42():

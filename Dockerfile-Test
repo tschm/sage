@@ -1,11 +1,14 @@
 # Set the base image to beakerx
-FROM sagemath/sagemath:8.6
+FROM sagemath/sagemath:8.7
 
-COPY ./work   /home/sage/work/kempner
-COPY ./test           /books/test
+# Copy the Notebooks into the image
+# COPY ./work ${HOME}/work
 
-RUN sage -pip install --no-cache-dir pytest==3.0.6 pandas==0.24.1
+# Copy the package into the image and install
+COPY . /tmp/sage
+RUN sage -pip install --no-cache-dir /tmp/sage pytest==3.0.6 hypothesis
 
+COPY ./test /books/test
 WORKDIR /books
 
 CMD py.test  /books/test

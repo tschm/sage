@@ -1,10 +1,12 @@
 # Set the base image to beakerx
-FROM sagemath/sagemath:8.6
+FROM sagemath/sagemath:8.7
 
+# Copy the Notebooks into the image
 COPY ./work ${HOME}/work
-RUN echo ${HOME}/work
 
-RUN sage -pip install --no-cache-dir pandas==0.24.1 line-profiler
+# Copy the package into the image and install
+COPY . /tmp/sage
+RUN sage -pip install --no-cache-dir /tmp/sage line-profiler
 
 EXPOSE 8888
 

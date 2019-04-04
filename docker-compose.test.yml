@@ -1,12 +1,11 @@
 version: '3.6'
 services:
-  test:
+  sut:
      build:
        context: .
        dockerfile: Dockerfile-Test
 
      volumes:
-        - ./books/kempner:/books/kempner:ro
-        - ./test:/books/test:ro
+        - ./test:/home/sage/test:ro
         - ./artifacts:/books/artifacts
         #- ./helpers:/opt/.pycharm_helpers/pycharm:ro

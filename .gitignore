@@ -8,8 +8,8 @@ html-coverage
 html-report
 
 
-sandbox
-.env
+#sandbox
+
 
 .ipynb_checkpoints
 octave-workspace
