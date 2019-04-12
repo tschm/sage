@@ -26,7 +26,7 @@ help:
 build:
 	docker-compose build jupyter
 
-test:
+test: 
 	mkdir -p artifacts
 	docker-compose -f docker-compose.test.yml build sut
 	docker-compose -f docker-compose.test.yml run sut
@@ -46,6 +46,6 @@ hub: tag
 	docker push ${IMAGE}:${PROJECT_VERSION}
 	docker rmi -f ${IMAGE}:${PROJECT_VERSION}
 
-slides:
+slides: build test
 	mkdir -p artifacts
 	cp -r work/* artifacts
