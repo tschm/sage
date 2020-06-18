@@ -1,14 +1,9 @@
 #!make
-PROJECT_VERSION := 0.1
-
+PROJECT_VERSION := 0.1.1
 SHELL := /bin/bash
-IMAGE := tschm/kempner
 
-# needed to get the ${PORT} environment variable
-include .env
-export
 
-.PHONY: help build test jupyter tag hub slides
+.PHONY: help build test jupyter tag
 
 
 .DEFAULT: help
@@ -26,26 +21,15 @@ help:
 build:
 	docker-compose build jupyter
 
-test: 
-	mkdir -p artifacts
-	docker-compose -f docker-compose.test.yml build sut
+test:
 	docker-compose -f docker-compose.test.yml run sut
 
 jupyter: build
-	echo "http://localhost:${PORT}"
+	echo "http://localhost:8888"
 	docker-compose up jupyter
 
 tag:
 	git tag -a ${PROJECT_VERSION} -m "new tag"
 	git push --tags
 
-hub: tag
-	docker build -f binder/Dockerfile --tag ${IMAGE}:latest --no-cache .
-	docker push ${IMAGE}:latest
-	docker tag ${IMAGE}:latest ${IMAGE}:${PROJECT_VERSION}
-	docker push ${IMAGE}:${PROJECT_VERSION}
-	docker rmi -f ${IMAGE}:${PROJECT_VERSION}
 
-slides: build test
-	mkdir -p artifacts
-	cp -r work/* artifacts
